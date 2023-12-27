@@ -1,5 +1,6 @@
 import t from "tap";
 import { init } from "../../../src";
+import { AccountingDoc } from "../../../src/models/Accounting";
 
 const getStore = () => init();
 
@@ -64,4 +65,36 @@ t.test("add entry, joe and jane went to dinner 2x", async (t) => {
     { name: "dinner", total: 100 },
     { name: "dinner 2", total: 90 },
   ]);
+});
+
+t.test("account test", async (t) => {
+  t.plan(1);
+  // Example usage
+  const doc = AccountingDoc.create({
+    id: "123",
+    lineItems: [
+      {
+        account: "Expense",
+        type: "DEBIT",
+        amount: 100,
+        transactionDate: new Date("2023-01-01"),
+      },
+      {
+        account: "Joe",
+        type: "CREDIT",
+        amount: 50,
+        transactionDate: new Date("2023-01-01"),
+      },
+      {
+        account: "Jane",
+        type: "CREDIT",
+        amount: 50,
+        transactionDate: new Date("2023-01-01"),
+      },
+    ],
+  });
+
+  t.same(doc.isValid, true);
+
+  // Add, edit, remove line items, update status as needed
 });
