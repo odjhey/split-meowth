@@ -1,5 +1,6 @@
 import { ExpenseModule } from "../models/Expense";
 import { generateReport } from "../libs/expense-report";
+import { sumUp } from "../libs/sum-up";
 
 type AddExpenseInput = {
   description: string;
@@ -19,6 +20,15 @@ const init = () => {
           expenses: trip.getExpenses(),
           settlements: trip.getSettlements(),
         }),
+      totals: () =>
+        sumUp(
+          generateReport({
+            expenses: trip.getExpenses(),
+            settlements: trip.getSettlements(),
+          }),
+
+          { amountField: "amount", keys: ["participant", "owesTo"] }
+        ),
       addExpense: (input: AddExpenseInput) =>
         trip.addExpense({ groupId: groupId, ...input }),
       addSettlement: (input: {

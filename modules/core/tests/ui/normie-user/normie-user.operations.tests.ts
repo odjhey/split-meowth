@@ -48,3 +48,34 @@ t.test(
     ]);
   }
 );
+
+t.test("totals view", async (t) => {
+  t.plan(3);
+  const store = getStore();
+  const ui = store.ui;
+  ui.addExpense({ description: "dinner", amount: 100 });
+  ui.addExpense({ description: "dinner 2", amount: 90 });
+
+  ui.addSettlement({
+    expenseId: "dinner",
+    paidBy: "jane",
+    sharedBy: { jane: 20, jake: 80 },
+  });
+  ui.addSettlement({
+    expenseId: "dinner 2",
+    paidBy: "jane",
+    sharedBy: { jane: 30, jake: 70 },
+  });
+
+  t.same(ui.expenses(), [
+    { id: "dinner", description: "dinner", amount: 100 },
+    { id: "dinner 2", description: "dinner 2", amount: 90 },
+  ]);
+
+  t.same(ui.reports(), [
+    { expenseId: "dinner", owesTo: "jane", participant: "jake", amount: 80 },
+    { expenseId: "dinner 2", owesTo: "jane", participant: "jake", amount: 70 },
+  ]);
+
+  t.same(ui.totals(), [{ owesTo: "jane", participant: "jake", amount: 150 }]);
+});
