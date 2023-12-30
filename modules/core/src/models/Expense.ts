@@ -51,10 +51,12 @@ export const ExpenseModule = types
   })
   .actions((self) => ({
     addGroup: (expenses: { amount: number; description: string }[]) => {
+      const groupId = Date.now().toString();
       self.groups.push({
-        id: Date.now().toString(),
+        id: groupId,
         expenses: expenses.map((e) => ({ ...e, id: e.description })),
       });
+      return groupId;
     },
 
     addExpense: (expense: {

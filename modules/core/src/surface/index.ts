@@ -1,35 +1,31 @@
-import { types } from "mobx-state-tree";
+import { ExpenseModule } from "../models/Expense";
+import { generateReport } from "../libs/expense-report";
 
 type AddExpenseInput = {
-  name: string;
-  total: number;
+  description: string;
+  amount: number;
   // TODO currency: string;
 };
 
-const Expense = types.model({
-  name: types.string,
-  total: types.number,
-  // TODO currency: types.string,
-});
-const Ui = types
-  .model({
-    expenses: types.array(Expense),
-  })
-  .views((self) => ({}))
-  .actions((self) => ({
-    addExpense(input: AddExpenseInput) {
-      self.expenses.push(input);
-    },
-  }));
-
 const init = () => {
-  const ui = Ui.create({});
+  const trip = ExpenseModule.create({});
+  const groupId = trip.addGroup([]);
 
   return {
     ui: {
-      hello: () => "world",
-      expenses: () => ui.expenses,
-      addExpense: (input: AddExpenseInput) => ui.addExpense(input),
+      expenses: () => trip.getExpenses(),
+      reports: () =>
+        generateReport({
+          expenses: trip.getExpenses(),
+          settlements: trip.getSettlements(),
+        }),
+      addExpense: (input: AddExpenseInput) =>
+        trip.addExpense({ groupId: groupId, ...input }),
+      addSettlement: (input: {
+        expenseId: string;
+        paidBy: string;
+        sharedBy: { [key: string]: number };
+      }) => trip.addSettlement(input),
     },
   } as const;
 };
